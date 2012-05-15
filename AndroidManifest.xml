@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="org.threebrothers.brendan.presence"
+          android:versionCode="1"
+          android:versionName="1.0">
+  <application android:label="@string/app_name"
+               android:name="PresenceApp"
+               android:debuggable="true"
+               android:icon="@drawable/ic_launcher">
+    
+    <activity android:name="PresenceActivity" android:label="@string/app_name">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+
+    <receiver android:enabled="true" android:name=".PresenceReceiver">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED_ACTION" />
+        <action android:name="android.intent.action.ACTION_PACKAGE_REPLACED" />
+        <action android:name="android.intent.action.USER_PRESENT" />
+      </intent-filter>
+    </receiver>
+    <service android:name=".ScreenService" android:enabled="true" />
+  </application>
+</manifest> 
