@@ -1,0 +1,6 @@
+bin
+gen
+vendor
+.bundle
+.rbenv-version
+local.properties
