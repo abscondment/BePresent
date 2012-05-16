@@ -49,6 +49,7 @@ class Chart
     maxx = System.currentTimeMillis
     minx = maxx
     maxy = long(-1)
+    miny = maxx
     
     db = PresenceApp.database.getReadableDatabase
     length = titles.length
@@ -77,6 +78,7 @@ class Chart
         
         y = results.getLong(di)
         maxy = y if y > maxy
+        miny = y if y < miny
 
         Log.d 'Chart', " -> (#{x}, #{y})"
         
@@ -109,22 +111,34 @@ class Chart
       XYSeriesRenderer(renderer.getSeriesRendererAt i).setFillPoints true
     end
 
-    setChartSettings(renderer, "Recent Usage", "Time", "Use", minx - x_fudge, maxx + x_fudge, 0, maxy, Color.LTGRAY, Color.LTGRAY)
+    setChartSettings(renderer, "In the last 6 hours...", String(nil), "Duration", minx - x_fudge, maxx + x_fudge, 0, maxy, Color.LTGRAY, Color.LTGRAY)
     
-    renderer.setXLabels(12)
-    renderer.setYLabels(10)
+    renderer.setXLabels(0)
+    interval = long(float((maxx - minx) + 2 * x_fudge) / 9.0)
+    9.times do |i|
+      at_x = minx + (interval * i)
+      renderer.addXTextLabel at_x, timestamp_to_time(at_x)
+    end
+    
+    renderer.setYLabels(0)
+    interval = long(float(maxy - miny) / 6.0)
+    6.times do |i|
+      at_y = miny + (interval * i)
+      renderer.addYTextLabel at_y, duration_in_words(at_y)
+    end
+
     renderer.setShowGrid(true)
     renderer.setXLabelsAlign(Align.RIGHT)
     renderer.setYLabelsAlign(Align.RIGHT)
-    renderer.setZoomButtonsVisible(true)
-
+    renderer.setZoomButtonsVisible(false)
+    
     limits = double[4]
-    limits[0] = -10
-    limits[1] = maxx + 20
-    limits[2] = -10
-    limits[3] = maxy + 20
+    limits[0] = 0
+    limits[1] = 0
+    limits[2] = 0
+    limits[3] = 0
     renderer.setPanLimits limits
-    renderer.setZoomLimits limits    
+    renderer.setZoomLimits limits
     
     ChartFactory.getCubicLineChartIntent(context, dataset, renderer, float(0.33), "Usage")
   end
@@ -138,9 +152,9 @@ class Chart
   end
   
   def setChartSettings(renderer:XYMultipleSeriesRenderer, title:String, xTitle:String, yTitle:String, xMin:double, xMax:double, yMin:double, yMax:double, axesColor:int, labelsColor:int):void
-    renderer.setChartTitle(title)
-    renderer.setXTitle(xTitle)
-    renderer.setYTitle(yTitle)
+    renderer.setChartTitle(title) unless title.nil?
+    renderer.setXTitle(xTitle) unless xTitle.nil?
+    renderer.setYTitle(yTitle) unless yTitle.nil?
     renderer.setXAxisMin(xMin)
     renderer.setXAxisMax(xMax)
     renderer.setYAxisMin(yMin)
@@ -157,9 +171,9 @@ class Chart
     renderer.setPointSize float(5)
     margins = int[4]
     margins[0] = 20
-    margins[1] = 30
-    margins[2] = 15
-    margins[3] = 20
+    margins[1] = 70
+    margins[2] = 20
+    margins[3] = 10
     renderer.setMargins margins
     
     length = colors.length
@@ -170,10 +184,30 @@ class Chart
       renderer.addSeriesRenderer r
     end
   end
-  
-  def date_format:DateFormat
-    format = SimpleDateFormat.new("yyyy-MM-dd'T'HH:mm:ss'Z'")
-    format.setCalendar Calendar.getInstance(SimpleTimeZone.new 0, "GMT")
-    format
+
+  def timestamp_to_time(time:long)
+    df = SimpleDateFormat.new("h:mm")
+    df.setCalendar Calendar.getInstance(SimpleTimeZone.getDefault)
+    df.format Date.new(time)
+  end
+
+  def duration_in_words(duration:long)
+    if duration < 120_000
+      seconds_duration = duration / 1_000
+      return "#{seconds_duration}s"
+    elsif duration < 3_600_000
+      minute_duration = duration / 60_000
+      return "#{minute_duration}m"
+    elsif duration < 86_400_000
+      hour_duration = duration / 3_600_000
+      return "#{hour_duration}h"
+    elsif duration < 2_629_743_000
+      day_duration = duration / 86_400_000
+      return "#{day_duration}d"
+    else
+      month_duration = duration / 2_629_743_000
+      return "#{month_duration} months"
+    end
+    return 'never'
   end
 end
