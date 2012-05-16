@@ -13,6 +13,8 @@ import java.util.ArrayList
 
 class PresenceApp < Application
   class << self
+    def get; @@instance; end
+    
     def record(intent:Intent):void
       action = intent.getAction
       time = System.currentTimeMillis
@@ -28,7 +30,8 @@ class PresenceApp < Application
         on_duration = time - prefs.getLong(Intent.ACTION_SCREEN_ON, time)
         present_duration = time - prefs.getLong(Intent.ACTION_USER_PRESENT, time)
 
-        # TODO: store data
+        @@database.record('SCREEN_ON', on_duration) if on_duration > 0
+        @@database.record('USER_PRESENT', present_duration) if present_duration > 0
 
         # reset watermarks
         prefs.edit.clear.apply
@@ -48,5 +51,6 @@ class PresenceApp < Application
   def onCreate:void
     super
     @@instance = self
+    @@database = Database.new
   end
 end
