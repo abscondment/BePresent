@@ -23,3 +23,8 @@ Definitely a work in progress...
  4. Build and install to a device like so:
     
          bundle exec rake clean debug install
+
+## Notices
+
+[Skull drawing](http://www.fotopedia.com/items/flickr-3561191040) used
+via a [CC BY 2.0 license](http://creativecommons.org/licenses/by/2.0/).

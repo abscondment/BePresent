@@ -3,11 +3,6 @@
           package="org.threebrothers.brendan.presence"
           android:versionCode="1"
           android:versionName="1.0">
-  <!--
-      Launcher icon:
-       * retrieved 2012-05-16 from http://www.fotopedia.com/items/flickr-3561191040
-       * licensed "CC BY 2.0"
-  -->
   <application android:label="@string/app_name"
                android:name="PresenceApp"
                android:debuggable="true"
