@@ -1,14 +1,24 @@
 # Be Present
 
+How distracting is your smartphone? Make it keep track and find out.
+
 Definitely a work in progress...
 
 ## Building
 
-First, grab the
-[achartengine jar](http://code.google.com/p/achartengine/downloads/list)
-and stick it in `libs`.
+### Prerequisites
 
-Next, you'll need JRuby with bundler installed. Once you're ready, `bundle install`
-will fetch Mirah and Pindah. Then you can install to a device like so:
+ * You'll need to have
+   [the Android SDK](http://developer.android.com/sdk/index.html)
+   installed on your machine.
+ * You need [JRuby](http://jruby.org/) 1.6+, which can be installed easily using [rbenv](https://github.com/sstephenson/rbenv#section_2) or [RVM](https://rvm.io/rvm/install/).
 
-    bundle exec rake clean debug install
+### Build it!
+   
+ 1. Modify `local.properties.example` to point to your Android SDK.
+ 2. Grab the
+    [achartengine jar](http://code.google.com/p/achartengine/downloads/list)
+    and stick it in `libs`.
+ 3. `bundle install` to grab the dependencies (Mirah, Pindah, and rake).
+ 4. Build and install to a device like so:
+        bundle exec rake clean debug install
