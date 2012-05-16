@@ -8,19 +8,34 @@ import android.widget.Toast
 
 import android.util.Log
 
+import java.io.File
 import java.util.ArrayList
 
 class PresenceApp < Application
   class << self
     def record(intent:Intent):void
-      a = intent.getAction
-      if a.equals(Intent.ACTION_SCREEN_ON) || a.equals(Intent.ACTION_SCREEN_OFF) || a.equals(Intent.ACTION_USER_PRESENT)
-        t = "#{System.currentTimeMillis}"
-        Log.d 'PresenceApp', "#{t} => #{a}"
+      action = intent.getAction
+      time = System.currentTimeMillis
+
+      if action.equals(Intent.ACTION_USER_PRESENT) || action.equals(Intent.ACTION_SCREEN_ON)
+        # Store this as last time the this action happened
+        getPreferences.edit.putLong(action, time).apply
+        Log.d 'PresenceApp', "STORED -> #{action} @ #{time}"
         
-        editor = getPreferences.edit
-        editor.putString(t, a)
-        editor.commit
+      elsif action.equals(Intent.ACTION_SCREEN_OFF)
+        prefs = getPreferences
+
+        on_duration = time - prefs.getLong(Intent.ACTION_SCREEN_ON, time)
+        present_duration = time - prefs.getLong(Intent.ACTION_USER_PRESENT, time)
+
+        # TODO: store data
+
+        # reset watermarks
+        prefs.edit.clear.apply
+
+        Log.d 'PresenceApp', "SCREEN_OFF:"
+        Log.d 'PresenceApp', " -> SCREEN_ON for #{on_duration}"
+        Log.d 'PresenceApp', " -> USER_PRESENT for #{present_duration}"
       end
     end
 
