@@ -21,4 +21,5 @@ Definitely a work in progress...
     and stick it in `libs`.
  3. `bundle install` to grab the dependencies (Mirah, Pindah, and rake).
  4. Build and install to a device like so:
-        bundle exec rake clean debug install
+    
+         bundle exec rake clean debug install
