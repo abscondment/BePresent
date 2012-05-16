@@ -14,7 +14,8 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
-
+    <activity android:name="org.achartengine.GraphicalActivity" />
+    
     <receiver android:enabled="true" android:name=".PresenceReceiver">
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED_ACTION" />
@@ -22,6 +23,7 @@
         <action android:name="android.intent.action.USER_PRESENT" />
       </intent-filter>
     </receiver>
+    
     <service android:name=".ScreenService" android:enabled="true" />
   </application>
 </manifest> 

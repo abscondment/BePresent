@@ -14,6 +14,7 @@ import java.util.ArrayList
 class PresenceApp < Application
   class << self
     def get; @@instance; end
+    def database; @@database; end
     
     def record(intent:Intent):void
       action = intent.getAction
