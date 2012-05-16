@@ -31,33 +31,37 @@ class Chart
 
     dataset = XYMultipleSeriesDataset.new
 
-    minx = System.currentTimeMillis
-    maxx = long(-1)
+    x_fudge = long(1000 * 60 * 5)
+    maxx = System.currentTimeMillis
+    minx = maxx
     maxy = long(-1)
+    
     db = PresenceApp.database.getReadableDatabase
     length = titles.length
     length.times do |i|
       series = XYSeries.new(titles[i], 0)
       
-      what = String[1]
+      args = String[2]
       if i == 0
-        what[0] = 'USER_PRESENT'
+        args[0] = 'USER_PRESENT'
       elsif i == 1
-        what[0] = 'SCREEN_ON'
+        args[0] = 'SCREEN_ON'
       end
       
-      results = db.rawQuery "SELECT created_at, duration FROM events WHERE what = ?;", what
+      # 6 hours ago
+      args[1] = "#{maxx - long(1000 * 60 * 60 * 6)}"
+      
+      results = db.rawQuery "SELECT created_at, duration FROM events WHERE what = ? AND created_at >= ?;", args
       results.moveToFirst
       ci = results.getColumnIndexOrThrow 'created_at'
       di = results.getColumnIndexOrThrow 'duration'
 
       scale = 1000.0 * 60.0 * 5.0
       while (!results.isAfterLast)
-        x = long(string_to_date(results.getString(ci)).getTime)
+        x = results.getLong(ci)
         minx = x if x < minx
-        maxx = x if x > maxx
         
-        y = long(results.getLong(di))
+        y = results.getLong(di)
         maxy = y if y > maxy
 
         Log.d 'Chart', " -> (#{x}, #{y})"
@@ -91,7 +95,7 @@ class Chart
       XYSeriesRenderer(renderer.getSeriesRendererAt i).setFillPoints true
     end
 
-    setChartSettings(renderer, "Recent Usage", "Time", "Use", minx, maxx, 0, maxy, Color.LTGRAY, Color.LTGRAY)
+    setChartSettings(renderer, "Recent Usage", "Time", "Use", minx - x_fudge, maxx + x_fudge, 0, maxy, Color.LTGRAY, Color.LTGRAY)
     
     renderer.setXLabels(12)
     renderer.setYLabels(10)
@@ -153,13 +157,9 @@ class Chart
     end
   end
   
-  def string_to_date(s:String):Date
-    s.nil? ? Date(nil) : date_format.parse(s)
-  end
-  
   def date_format:DateFormat
     format = SimpleDateFormat.new("yyyy-MM-dd'T'HH:mm:ss'Z'")
     format.setCalendar Calendar.getInstance(SimpleTimeZone.new 0, "GMT")
     format
-  end  
+  end
 end

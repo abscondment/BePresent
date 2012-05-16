@@ -35,7 +35,7 @@ class Database < SQLiteOpenHelper
 id INTEGER PRIMARY KEY,
 what TEXT,
 duration INTEGER,
-created_at DATE
+created_at INTEGER
 );"
     end
   end
@@ -44,7 +44,7 @@ created_at DATE
     v = ContentValues.new
     v.put 'what', what
     v.put 'duration', Long.new(duration)
-    v.put 'created_at', generate_created_at
+    v.put 'created_at', Long.new(System.currentTimeMillis)
     
     db = getWritableDatabase
     db.insert('events', String(nil), v)
@@ -55,13 +55,6 @@ created_at DATE
   
   def version:int
     @version
-  end
-
-  def generate_created_at:String
-    cal = Calendar.getInstance(SimpleTimeZone.new 0, "GMT")
-    df = SimpleDateFormat.new("yyyy-MM-dd'T'HH:mm:ss'Z'")
-    df.setCalendar cal
-    df.format(cal.getTime)
   end
   
 end
